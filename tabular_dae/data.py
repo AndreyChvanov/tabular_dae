@@ -27,17 +27,17 @@ class StandardScaler(object):
 
 class LabelEncoder(object):
     def __init__(self):
-        self.mapping = dict()
+        self.mapping = dict(unk=0)
 
     def __len__(self):
         return len(self.mapping)
 
     def fit(self, x):
-        self.mapping = {v: i for i, v in enumerate(set(x))}
+        self.mapping.update({v: i + 1 for i, v in enumerate(set(x))})
         return self
 
     def transform(self, x):
-        return np.array(list(map(self.mapping.__getitem__, x)))
+        return np.array(list(map(lambda x: self.mapping.get(x, self.mapping['unk']), x)))
 
 
 class FreqLabelEncoder(object):
@@ -178,3 +178,4 @@ class SingleDataset(Dataset):
         if self.n_cats: single_data['cats'] = self.data[index, self.n_bins: self.n_bins + self.n_cats].astype('float32')
         if self.n_nums: single_data['nums'] = self.data[index, -self.n_nums:].astype('float32')
         return single_data
+
